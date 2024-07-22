@@ -2,7 +2,8 @@ import { UserService } from './../user/user.service'
 import {
   BadRequestException,
   Injectable,
-  NotFoundException
+  NotFoundException,
+  UnauthorizedException
 } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { AuthDto } from './dto/auth.dto'
@@ -44,30 +45,20 @@ export class AuthService {
     }
   }
 
-  private issueTokens(userId: string) {
-    const data = { id: userId }
+  async getNewToken(refreshToken: string) {
+    const result = await this.jwt.verifyAsync(refreshToken)
 
-    const accessToken = this.jwt.sign(data, {
-      expiresIn: '1h'
-    })
+    if (!result) throw new UnauthorizedException('Invalid refresh token')
 
-    const refreshToken = this.jwt.sign(data, {
-      expiresIn: '72h'
-    })
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, ...user } = await this.userService.getById(result.id)
 
-    return { accessToken, refreshToken }
-  }
+    const tokens = await this.issueTokens(user.id)
 
-  private async validateUser(dto: AuthDto) {
-    const user = await this.userService.getByEmail(dto.email)
-
-    if (!user) throw new NotFoundException('User not found')
-
-    const isValid = await verify(user.password, dto.password)
-
-    if (!isValid) throw new NotFoundException('Invalid password')
-
-    return user
+    return {
+      user,
+      ...tokens
+    }
   }
 
   addRefreshTokenToResponse(res: Response, refreshToken: string) {
@@ -95,5 +86,31 @@ export class AuthService {
       // lax in production
       sameSite: 'none'
     })
+  }
+
+  private issueTokens(userId: string) {
+    const data = { id: userId }
+
+    const accessToken = this.jwt.sign(data, {
+      expiresIn: '1h'
+    })
+
+    const refreshToken = this.jwt.sign(data, {
+      expiresIn: '72h'
+    })
+
+    return { accessToken, refreshToken }
+  }
+
+  private async validateUser(dto: AuthDto) {
+    const user = await this.userService.getByEmail(dto.email)
+
+    if (!user) throw new NotFoundException('User not found')
+
+    const isValid = await verify(user.password, dto.password)
+
+    if (!isValid) throw new NotFoundException('Invalid password')
+
+    return user
   }
 }
