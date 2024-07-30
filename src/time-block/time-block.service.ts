@@ -1,21 +1,24 @@
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from 'prisma/prisma.service'
-import { TaskDto } from './dto/time-block.dto'
+import { TimeBlockDto } from './dto/time-block.dto'
 
 @Injectable()
-export class TaskService {
+export class TimeBlockService {
   constructor(private prisma: PrismaService) {}
 
   async getAll(userId: string) {
-    return this.prisma.task.findMany({
+    return this.prisma.timeBlock.findMany({
       where: {
         userId
+      },
+      orderBy: {
+        order: 'asc'
       }
     })
   }
 
-  async create(dto: TaskDto, userId: string) {
-    return this.prisma.task.create({
+  async create(dto: TimeBlockDto, userId: string) {
+    return this.prisma.timeBlock.create({
       data: {
         ...dto,
         user: {
@@ -27,21 +30,37 @@ export class TaskService {
     })
   }
 
-  async update(dto: Partial<TaskDto>, taskId: string, userId: string) {
-    return this.prisma.task.update({
+  async update(
+    dto: Partial<TimeBlockDto>,
+    timeBlockId: string,
+    userId: string
+  ) {
+    return this.prisma.timeBlock.update({
       where: {
         userId,
-        id: taskId
+        id: timeBlockId
       },
       data: dto
     })
   }
 
-  async delete(taskId: string) {
-    return this.prisma.task.delete({
+  async delete(timeBlockId: string, userId: string) {
+    return this.prisma.timeBlock.delete({
       where: {
-        id: taskId
+        id: timeBlockId,
+        userId
       }
     })
+  }
+
+  async updateOrder(ids: string[]) {
+    return this.prisma.$transaction(
+      ids.map((id, order) =>
+        this.prisma.timeBlock.update({
+          where: { id },
+          data: { order }
+        })
+      )
+    )
   }
 }

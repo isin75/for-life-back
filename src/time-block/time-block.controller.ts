@@ -46,9 +46,9 @@ export class TimeBlockController {
   }
 
   @HttpCode(200)
-  @Delete()
+  @Delete(':id')
   @Auth()
-  async delete(@Param('id') id: string) {
-    return this.timeBlockService.delete(id)
+  async delete(@CurrentUser('id') userId: string, @Param('id') id: string) {
+    return this.timeBlockService.delete(id, userId)
   }
 }
