@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core'
 import { AppModule } from './app.module'
 import * as cookieParser from 'cookie-parser'
+import { env } from 'process'
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)
@@ -8,10 +9,10 @@ async function bootstrap() {
   app.setGlobalPrefix('api')
   app.use(cookieParser())
   app.enableCors({
-    origin: ['http://localhost:8080/'],
+    origin: env.URL_CLIENT,
     credentials: true,
     exposedHeaders: 'set-cookie'
   })
-  await app.listen(3000)
+  await app.listen(env.URL)
 }
 bootstrap()
