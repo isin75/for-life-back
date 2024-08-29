@@ -13,6 +13,6 @@ async function bootstrap() {
     credentials: true,
     exposedHeaders: 'set-cookie'
   })
-  await app.listen(env.URL)
+  await app.listen(env.PORT)
 }
 bootstrap()
