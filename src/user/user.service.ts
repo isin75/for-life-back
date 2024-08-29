@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { hash } from 'argon2'
-import { PrismaService } from 'prisma/prisma.service'
+import { PrismaService } from 'src/prisma.service'
 import { AuthDto } from 'src/auth/dto/auth.dto'
 import { UserDto } from './dto/user.dto'
 import { startOfDay, subDays } from 'date-fns'
