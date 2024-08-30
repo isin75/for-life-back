@@ -11,8 +11,8 @@ import {
   ValidationPipe
 } from '@nestjs/common'
 import { TaskService } from './task.service'
-import { CurrentUser } from 'src/auth/decorators/user.decorator'
-import { Auth } from 'src/auth/decorators/auth.decorator'
+import { CurrentUser } from '../auth/decorators/user.decorator'
+import { Auth } from '../auth/decorators/auth.decorator'
 import { TaskDto } from './dto/task.dto'
 
 @Controller('task/')

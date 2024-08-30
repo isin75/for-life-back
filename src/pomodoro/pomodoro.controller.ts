@@ -11,8 +11,8 @@ import {
   ValidationPipe
 } from '@nestjs/common'
 import { PomodoroService } from './pomodoro.service'
-import { Auth } from 'src/auth/decorators/auth.decorator'
-import { CurrentUser } from 'src/auth/decorators/user.decorator'
+import { Auth } from '../auth/decorators/auth.decorator'
+import { CurrentUser } from '../auth/decorators/user.decorator'
 import { PomodoroRoundDto, PomodoroSessionDto } from './dto/pomodoro.dto'
 
 @Controller('user/timer')
