@@ -15,7 +15,7 @@ import { CurrentUser } from '../auth/decorators/user.decorator'
 import { Auth } from '../auth/decorators/auth.decorator'
 import { TaskDto } from './dto/task.dto'
 
-@Controller('tasks/')
+@Controller('user/tasks/')
 export class TaskController {
   constructor(private readonly taskService: TaskService) {}
 
