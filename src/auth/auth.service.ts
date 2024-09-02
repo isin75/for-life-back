@@ -71,8 +71,9 @@ export class AuthService {
       domain,
       expires: expiresIn,
       secure: true,
+      path: '/',
       // lax in production
-      sameSite: 'lax'
+      sameSite: 'none'
     })
   }
 
@@ -84,7 +85,7 @@ export class AuthService {
       expires: new Date(0),
       secure: true,
       // lax in production
-      sameSite: 'lax'
+      sameSite: 'none'
     })
   }
 
@@ -92,7 +93,7 @@ export class AuthService {
     const data = { id: userId }
 
     const accessToken = this.jwt.sign(data, {
-      expiresIn: '1h'
+      expiresIn: '24h'
     })
 
     const refreshToken = this.jwt.sign(data, {
