@@ -73,7 +73,7 @@ export class AuthService {
       secure: true,
       path: '/',
       // lax in production
-      sameSite: 'strict'
+      sameSite: 'lax'
     })
   }
 
@@ -85,7 +85,7 @@ export class AuthService {
       expires: new Date(0),
       secure: true,
       // lax in production
-      sameSite: 'strict'
+      sameSite: 'lax'
     })
   }
 
