@@ -8,18 +8,29 @@ datasource db {
 }
 
 model User {
-  id               String            @id @default(cuid())
-  createdAt        DateTime          @default(now()) @map("created_at")
-  updatedAt        DateTime          @updatedAt @map("updated_at")
-  email            String            @unique
-  name             String?
-  password         String
-  workInterval     Int?              @default(50) @map("work_interval")
-  breakInterval    Int?              @default(10) @map("break_interval")
-  intervalsCount   Int?              @default(7) @map("interval_count")
-  pomodoroSessions PomodoroSession[]
-  tasks            Task[]
-  timeBlocks       TimeBlock[]
+  id                  String            @id @default(cuid())
+  createdAt           DateTime          @default(now()) @map("created_at")
+  updatedAt           DateTime          @updatedAt @map("updated_at")
+  email               String            @unique
+  name                String?
+  password            String
+  workInterval        Int?              @default(50) @map("work_interval")
+  breakInterval       Int?              @default(10) @map("break_interval")
+  intervalsCount      Int?              @default(7) @map("interval_count")
+  pomodoroSessions    PomodoroSession[]
+  tasks               Task[]
+  timeBlocks          TimeBlock[]
+  rateOfPay           Int?              @map("rate_of_pay")
+  nightTimeRateOfPay  Int?              @map("night_time_rate_of_pay")
+  bonuses             Json?
+  taxBenefit          Int?              @map("tax_benefit")
+  pensionInsurance    Int?              @map("pension_insurance")
+  disabilityInsurance Int?              @map("disability_insurance")
+  sicknessInsurance   Int?              @map("sickness_insurance")
+  incomeTax           Int?              @map("income_tax")
+  healthInsurance     Int?              @map("health_insurance")
+  finalTaxBase        Int?              @map("final_tax_base")
+  revenueExpenditure  Int?              @map("revenue_expenditure")
 
   @@map("user")
 }
@@ -30,7 +41,7 @@ model Task {
   updatedAt   DateTime  @updatedAt @map("updated_at")
   name        String
   priority    Priority?
-  order    Int?
+  order       Int?
   isCompleted Boolean?  @default(false) @map("is_completed")
   userId      String    @map("user_id")
   user        User      @relation(fields: [userId], references: [id])
@@ -80,4 +91,24 @@ enum Priority {
   low
   medium
   high
+}
+
+model Salary {
+  id                  String   @id @default(cuid())
+  createdAt           DateTime @default(now()) @map("created_at")
+  daysWorked          Int?     @map("days_worked")
+  hoursWorked         Int?     @map("hours_worked")
+  daytimeHours        Int?     @map("daytime_hours")
+  nightHours          Int?     @map("night_hours")
+  salaryGross         Int      @map("salary_gross")
+  salaryNetto         Int      @map("salary_netto")
+  pensionInsurance    Int      @map("pension_insurance")
+  disabilityInsurance Int      @map("disability_insurance")
+  sicknessInsurance   Int      @map("sickness_insurance")
+  socialInsuraceTotal Int      @map("social_insurance_total")
+  incomeTax           Int      @map("income_tax")
+  healthInsurance     Int      @map("health_insurance")
+  finalTaxBase        Int      @map("final_tax_base")
+
+  @@map("salary")
 }
