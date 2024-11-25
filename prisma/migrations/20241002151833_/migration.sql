@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE "goals" ALTER COLUMN "is_completed" SET DEFAULT false,
+ALTER COLUMN "percent_compiled" DROP NOT NULL;
+ALTER TABLE "goals" ADD COLUMN "link" VARCHAR DEFAULT '' NOT NULL;
+ALTER TABLE "goals" ADD COLUMN "title" VARCHAR DEFAULT '' NOT NULL;

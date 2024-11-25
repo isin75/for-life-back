@@ -1,81 +1,11 @@
 import {
-  IsArray,
   IsEmail,
   IsNumber,
   IsOptional,
   IsString,
-  Max,
-  Min,
   MinLength
 } from 'class-validator'
-
-interface IBonuses {
-  [key: string]: number
-}
-
-export class PomodoroSettingsDto {
-  @IsOptional()
-  @IsNumber()
-  @Min(1)
-  workInterval?: number
-
-  @IsOptional()
-  @IsNumber()
-  @Min(1)
-  breakInterval?: number
-
-  @IsOptional()
-  @IsNumber()
-  @Min(1)
-  @Max(10)
-  intervalsCount?: number
-}
-
-export class SalarySettingsDto {
-  @IsOptional()
-  @IsNumber()
-  rateOfPay?: number
-
-  @IsOptional()
-  @IsNumber()
-  nightTimeRateOfPay?: number
-
-  @IsOptional()
-  @IsArray()
-  bonuses?: IBonuses[]
-
-  @IsOptional()
-  @IsNumber()
-  taxBenefit?: number
-
-  @IsOptional()
-  @IsNumber()
-  pensionInsurance?: number
-
-  @IsOptional()
-  @IsNumber()
-  disabilityInsurance?: number
-
-  @IsOptional()
-  @IsNumber()
-  sicknessInsurance?: number
-
-  @IsOptional()
-  @IsNumber()
-  incomeTax?: number
-
-  @IsOptional()
-  @IsNumber()
-  healthInsurance?: number
-
-  @IsOptional()
-  @IsNumber()
-  finalTaxBase?: number
-
-  @IsOptional()
-  @IsNumber()
-  revenueExpenditure?: number
-}
+import { PomodoroSettingsDto } from 'src/pomodoro/dto/pomodoro.dto'
 
 export class UserDto extends PomodoroSettingsDto {
   @IsEmail()
@@ -92,4 +22,8 @@ export class UserDto extends PomodoroSettingsDto {
   @IsOptional()
   @IsString()
   password: string
+
+  @IsOptional()
+  @IsNumber()
+  totalDebt?: number
 }

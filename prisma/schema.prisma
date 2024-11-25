@@ -8,29 +8,23 @@ datasource db {
 }
 
 model User {
-  id                  String            @id @default(cuid())
-  createdAt           DateTime          @default(now()) @map("created_at")
-  updatedAt           DateTime          @updatedAt @map("updated_at")
-  email               String            @unique
-  name                String?
-  password            String
-  workInterval        Int?              @default(50) @map("work_interval")
-  breakInterval       Int?              @default(10) @map("break_interval")
-  intervalsCount      Int?              @default(7) @map("interval_count")
-  pomodoroSessions    PomodoroSession[]
-  tasks               Task[]
-  timeBlocks          TimeBlock[]
-  rateOfPay           Int?              @map("rate_of_pay")
-  nightTimeRateOfPay  Int?              @map("night_time_rate_of_pay")
-  bonuses             Json?
-  taxBenefit          Int?              @map("tax_benefit")
-  pensionInsurance    Int?              @map("pension_insurance")
-  disabilityInsurance Int?              @map("disability_insurance")
-  sicknessInsurance   Int?              @map("sickness_insurance")
-  incomeTax           Int?              @map("income_tax")
-  healthInsurance     Int?              @map("health_insurance")
-  finalTaxBase        Int?              @map("final_tax_base")
-  revenueExpenditure  Int?              @map("revenue_expenditure")
+  id                 String               @id @default(cuid())
+  createdAt          DateTime             @default(now()) @map("created_at")
+  updatedAt          DateTime             @updatedAt @map("updated_at")
+  email              String               @unique
+  name               String?
+  password           String
+  workInterval       Int?                 @default(50) @map("work_interval")
+  breakInterval      Int?                 @default(10) @map("break_interval")
+  intervalsCount     Int?                 @default(7) @map("interval_count")
+  totalDebt          Float?               @map("total_debt")
+  pomodoroSessions   PomodoroSession[]
+  tasks              Task[]
+  timeBlocks         TimeBlock[]
+  debt               Debt[]
+  salarySettings     SalarySettings[]
+  distributeSettings DistributeSettings[]
+  goalsSettings      GoalsSettings[]
 
   @@map("user")
 }
@@ -93,22 +87,127 @@ enum Priority {
   high
 }
 
+model SalarySettings {
+  id                         String   @id @default(cuid())
+  rateOfPay                  Float?   @map("rate_of_pay")
+  minimumRate                Float?   @map("minimum_rate")
+  nightTimeRateOfPay         Float?   @map("night_time_rate_of_pay")
+  bonuses                    Json?
+  taxBenefit                 Float?   @map("tax_benefit")
+  pensionInsurancePercent    Float?   @map("pension_insurance_percent")
+  disabilityInsurancePercent Float?   @map("disability_insurance_percent")
+  sicknessInsurancePercent   Float?   @map("sickness_insurance_percent")
+  incomeTaxPercent           Float?   @map("income_tax_percent")
+  healthInsurancePercent     Float?   @map("health_insurance_percent")
+  revenueExpenditure         Float?   @map("revenue_expenditure")
+  fourBrigadePercent         Float?   @map("four_brigade_percent")
+  totalSalary                Float?   @map("total_salary")
+  totalTax                   Float?   @map("total_tax")
+  salary                     Salary[]
+  userId                     String   @map("user_id")
+  user                       User     @relation(fields: [userId], references: [id])
+
+  @@map("salary_settings")
+}
+
 model Salary {
-  id                  String   @id @default(cuid())
-  createdAt           DateTime @default(now()) @map("created_at")
-  daysWorked          Int?     @map("days_worked")
-  hoursWorked         Int?     @map("hours_worked")
-  daytimeHours        Int?     @map("daytime_hours")
-  nightHours          Int?     @map("night_hours")
-  salaryGross         Int      @map("salary_gross")
-  salaryNetto         Int      @map("salary_netto")
-  pensionInsurance    Int      @map("pension_insurance")
-  disabilityInsurance Int      @map("disability_insurance")
-  sicknessInsurance   Int      @map("sickness_insurance")
-  socialInsuraceTotal Int      @map("social_insurance_total")
-  incomeTax           Int      @map("income_tax")
-  healthInsurance     Int      @map("health_insurance")
-  finalTaxBase        Int      @map("final_tax_base")
+  id                   String         @id @default(cuid())
+  createdAt            DateTime       @default(now()) @map("created_at")
+  hoursWorked          Int?           @map("hours_worked")
+  nightHours           Int?           @map("night_hours")
+  salaryGross          Float          @map("salary_gross")
+  salaryNetto          Float          @map("salary_netto")
+  pensionInsurance     Float          @map("pension_insurance")
+  disabilityInsurance  Float          @map("disability_insurance")
+  sicknessInsurance    Float          @map("sickness_insurance")
+  socialInsuranceTotal Float          @map("social_insurance_total")
+  incomeTax            Float          @map("income_tax")
+  healthInsurance      Float          @map("health_insurance")
+  finalTaxBase         Float          @map("final_tax_base")
+  monthYear            String         @map("month_year")
+  salarySettingsId     String         @map("salary_settings")
+  salarySettings       SalarySettings @relation(fields: [salarySettingsId], references: [id], onDelete: Cascade)
 
   @@map("salary")
+}
+
+model DistributeSettings {
+  id                                      String             @id @default(cuid())
+  majorExpendituresPercent                Float?             @map("major_expenditures_percernt")
+  savingsAndInvestmentsPercent            Float?             @map("saving_and_investments_percent")
+  deferredGoalsPercent                    Float?             @map("deferred_goals_percent")
+  entertainmentAndPersonalExpensesPercent Float?             @map("entertainment_and_personal_expenses_percent")
+  charityAndGiftsPercent                  Float?             @map("charity_and_gifts_percent")
+  addInvestmentsOrRepaymentOfDebtsPercent Float?             @map("add_investments_or_repayment_of_debts_percent")
+  onTheFirstGoal                          Boolean            @default(true) @map("on_the_first_goal")
+  isWeeklyExpenses                        Boolean            @default(false) @map("is_weekly_expenses")
+  userId                                  String             @map("user_id")
+  user                                    User               @relation(fields: [userId], references: [id])
+  DistributeSalary                        DistributeSalary[]
+
+  @@map("distribute_settings")
+}
+
+model DistributeSalary {
+  id                               String             @id @default(cuid())
+  total                            Float
+  left                             Float
+  monthYear                        String             @map("month_year")
+  majorExpenditures                Float?             @map("major_expenditures")
+  savingsAndInvestments            Float?             @map("saving_and_investments")
+  deferredGoals                    Float?             @map("deferred_goals")
+  entertainmentAndPersonalExpenses Float?             @map("entertainment_and_personal_expenses")
+  charityAndGifts                  Float?             @map("charity_and_gifts")
+  addInvestmentsOrRepaymentOfDebts Float?             @map("add_investments_or_repayment_of_debts")
+  weeklyExpenses                   Json[]             @map("weekly_expenses")
+  distributeSettingsId             String             @map("salary_settings")
+  distributeSettings               DistributeSettings @relation(fields: [distributeSettingsId], references: [id], onDelete: Cascade)
+
+  @@map("distribute_salary")
+}
+
+model GoalsSettings {
+  id             String  @id @default(cuid())
+  totalSave      Float   @default(0) @map("total_save")
+  forARainyDay   Float   @default(0) @map("for_a_rany_day")
+  undistributed  Float   @default(0)
+  percentOnGoals Json?   @map("percent_on_goals")
+  goals          Goals[]
+  userId         String  @unique @map("user_id")
+  user           User    @relation(fields: [userId], references: [id])
+}
+
+model Goals {
+  id              String         @id @default(cuid())
+  title           String
+  link            String
+  price           Float
+  compiled        Float          @default(0)
+  left            Float          @default(0)
+  percentCompiled Float?         @default(0) @map("percent_compiled")
+  percentOnTarget Float?         @map("percent_on_target")
+  order           Int            @default(1)
+  isCompleted     Boolean        @default(false) @map("is_completed")
+  picture         String?
+  debtId          String?        @map("debt_id")
+  debt            Debt?          @relation(fields: [debtId], references: [id])
+  goalsSettings   GoalsSettings? @relation(fields: [goalsSettingsId], references: [id])
+  goalsSettingsId String?
+
+  @@map("goals")
+}
+
+model Debt {
+  id             String  @id @default(cuid())
+  title          String
+  amount         Float
+  refundedAmount Float   @default(0) @map("refunded_amount")
+  left           Float   @default(0)
+  order          Int     @default(1)
+  isCompleted    Boolean @default(false) @map("is_completed")
+  userId         String  @map("user_id")
+  user           User    @relation(fields: [userId], references: [id])
+  goals          Goals[]
+
+  @@map("debt")
 }
