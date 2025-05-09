@@ -40,6 +40,17 @@ export class SalaryController {
 
   @UsePipes(new ValidationPipe())
   @HttpCode(200)
+  @Patch('settings')
+  @Auth()
+  async updateSettings(
+    @Body() dto: SalarySettingsDto,
+    @CurrentUser('id') userId: string
+  ) {
+    return this.salaryService.updateSettings(dto, userId)
+  }
+
+  @UsePipes(new ValidationPipe())
+  @HttpCode(200)
   @Get()
   @Auth()
   async getAll(@CurrentUser('id') userId: string) {

@@ -10,6 +10,8 @@ import { DistributionModule } from './distribution/distribution.module'
 import { GoalsModule } from './goals/goals.module'
 import { DebtModule } from './debt/debt.module'
 import { TransferFundsModule } from './transfer-funds/transfer-funds.module'
+import { RentBreakdownModule } from './rent-breakdown/rent-breakdown.module'
+import { RegularFeesModule } from './regular-fees/regular-fees.module';
 
 @Module({
   imports: [
@@ -23,7 +25,9 @@ import { TransferFundsModule } from './transfer-funds/transfer-funds.module'
     DistributionModule,
     GoalsModule,
     DebtModule,
-    TransferFundsModule
+    TransferFundsModule,
+    RentBreakdownModule,
+    RegularFeesModule
   ]
 })
 export class AppModule {}

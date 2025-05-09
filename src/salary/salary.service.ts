@@ -62,6 +62,18 @@ export class SalaryService {
     })
   }
 
+  async updateSettings(dto: SalarySettingsDto, userId: string) {
+    const settings = await this.prisma.salarySettings.findFirst({
+      where: { userId }
+    })
+    return this.prisma.salarySettings.update({
+      where: {
+        id: settings.id
+      },
+      data: dto
+    })
+  }
+
   async create(dto: SalaryDto, userId: string) {
     const { hoursWorked, year, month } = dto
     const monthYear = `${month}.${year}`

@@ -25,6 +25,8 @@ model User {
   salarySettings     SalarySettings[]
   distributeSettings DistributeSettings[]
   goalsSettings      GoalsSettings[]
+  RentSettings       RentSettings[]
+  SavingAccount      SavingAccount[]
 
   @@map("user")
 }
@@ -127,6 +129,7 @@ model Salary {
   monthYear            String         @map("month_year")
   salarySettingsId     String         @map("salary_settings")
   salarySettings       SalarySettings @relation(fields: [salarySettingsId], references: [id], onDelete: Cascade)
+  Expense              Expense[]
 
   @@map("salary")
 }
@@ -210,4 +213,126 @@ model Debt {
   goals          Goals[]
 
   @@map("debt")
+}
+
+model RentSettings {
+  id                           String     @id @default(cuid())
+  gasSubscriptionFee           Float?     @map("gas_subscription_fee")
+  gasConversionRate            Float?     @map("gas_conversion_rate")
+  gasConsumptionPrice          Float?     @map("gas_consumption_price")
+  gasDistributionFixed         Float?     @map("gas_distribution_fixed")
+  gasDistributiveVariablePrice Float?     @map("gas_distributive_variable_price")
+  gas                          Gas[]
+  electricKilowattPrice        Float?     @map("electric_kilowatt_price")
+  electricFixedRate            Float?     @map("electric_fixed_rate")
+  electricFixedComponent       Float?     @map("electric_fixed_component")
+  electricTransferFee          Float?     @map("electric_transfer_fee")
+  electricQualityRate          Float?     @map("electric_quality_rate")
+  electricNetworkSpeed         Float?     @map("electric_network_speed")
+  electricOZE                  Float?     @map("electric_OZE")
+  electricCogenerationFee      Float?     @map("electric_cogeneration_fee")
+  electricSubscriptionRate     Float?     @map("electric_subscription_rate")
+  electric                     Electric[]
+  userId                       String     @unique @map("user_id")
+  user                         User       @relation(fields: [userId], references: [id])
+  Rent                         Rent[]
+
+  @@map("rent_settings")
+}
+
+model Gas {
+  id             String       @id @default(cuid())
+  date           String
+  value          Int
+  gasConsumption Int          @map("gas_consumption")
+  gasPrice       Float        @map("gas_price")
+  rentSettings   RentSettings @relation(fields: [rentSettingsId], references: [id])
+  rentSettingsId String       @map("rent_settings_id")
+
+  @@map("gas")
+}
+
+model Electric {
+  id                  String       @id @default(cuid())
+  date                String
+  value               Int
+  electricConsumption Int          @map("electric_consumption")
+  electricPrice       Float        @map("electric_price")
+  rentSettings        RentSettings @relation(fields: [rentSettingsId], references: [id])
+  rentSettingsId      String       @map("rent_settings_id")
+
+  @@map("electric")
+}
+
+model Rent {
+  id             String       @id @default(cuid())
+  date           String
+  heating        Json
+  water          Json
+  rentSettings   RentSettings @relation(fields: [rentSettingsId], references: [id])
+  rentSettingsId String       @map("rent_settings_id")
+
+  @@map("rent")
+}
+
+model SavingAccount {
+  id         String   @id @default(uuid())
+  userId     String   @unique
+  balance    Decimal  @default(0.00)
+  categories Json[]   @default([])
+  updatedAt  DateTime @updatedAt
+
+  transactions Transaction[]
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("saving_account")
+}
+
+model Transaction {
+  id             String          @id @default(uuid())
+  accountId      String
+  amount         Decimal
+  requiredAmount Decimal
+  currentSaved   Decimal
+  difference     Decimal
+  action         ActionType
+  type           TransactionType
+  category       String?
+  createdAt      DateTime        @default(now())
+
+  account SavingAccount @relation(fields: [accountId], references: [id])
+}
+
+enum TransactionType {
+  DEPOSIT
+  WITHDRAWAL
+}
+
+enum ActionType {
+  DEPOSIT
+  WITHDRAWAL
+  NONE
+}
+
+model Expense {
+  id             String    @id @default(uuid())
+  salaryId       String    @map("salary_id") // Связь с MonthlyBudget
+  name           String
+  category       String
+  date           String?
+  amount         Decimal // Полная сумма расхода
+  savedAmount    Decimal? // Сколько уже накоплено
+  savedPrefMonth Decimal?
+  frequency      Frequency
+  deadline       String? // Дата дедлайна (если не MONTHLY)
+  userId         String    @map("user_id") // Чей это расход
+  salary         Salary    @relation(fields: [salaryId], references: [id])
+}
+
+enum Frequency {
+  MONTHLY
+  QUARTERLY
+  YEARLY
+  ONE_TIME
 }

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/prisma.service'
 import {
@@ -71,19 +72,37 @@ export class DistributionService {
       where: { userId }
     })
 
+    const expenses = await this.prisma.expense.findMany({
+      where: { userId }
+    })
+
     if (!settings) {
       throw new Error(`User settings with id ${userId} not found`)
     }
 
-    const distributionData = calculateDistribution(settings, salary, monthYear)
-    console.log(distributionData)
+    const {
+      sum,
+      expenses: expensesWithDistribution,
+      ...distributionData
+    } = calculateDistribution(settings, salary, monthYear, expenses)
+
+    for (const expense of expenses) {
+      await this.prisma.expense.update({
+        where: { id: expense.id },
+        data: {
+          savedPrefMonth: expense.savedPrefMonth,
+          savedAmount: expense.savedAmount
+        }
+      })
+    }
 
     if (settings.isWeeklyExpenses) {
       const weeks = weeksBetweenDates(monthYear)
+
       const moneyPrefWeek = distributionData.majorExpenditures / weeks
       const weeklyExpenses = createObjectArray(weeks, moneyPrefWeek)
 
-      return await this.prisma.distributeSalary.create({
+      const create = await this.prisma.distributeSalary.create({
         data: {
           ...distributionData,
           weeklyExpenses,
@@ -94,9 +113,11 @@ export class DistributionService {
           }
         }
       })
+
+      return { ...create, weeklyExpenses, sum }
     }
 
-    return await this.prisma.distributeSalary.create({
+    const create = await this.prisma.distributeSalary.create({
       data: {
         ...distributionData,
         distributeSettings: {
@@ -106,10 +127,15 @@ export class DistributionService {
         }
       }
     })
+
+    return { ...create, sum }
   }
 
   async update(dto: DistributionUpdateDto, monthYear: string, userId: string) {
     const settings = await this.prisma.distributeSettings.findFirst({
+      where: { userId }
+    })
+    const expenses = await this.prisma.expense.findMany({
       where: { userId }
     })
     const { id, salary } = dto
@@ -119,7 +145,7 @@ export class DistributionService {
     }
 
     const distributionData = salary
-      ? calculateDistribution(settings, dto.salary, monthYear)
+      ? calculateDistribution(settings, dto.salary, monthYear, expenses)
       : dto
 
     return await this.prisma.distributeSalary.update({
